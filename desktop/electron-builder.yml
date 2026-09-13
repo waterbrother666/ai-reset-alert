@@ -1,0 +1,21 @@
+appId: com.waterbrother666.ai-reset-alert
+productName: ai-reset-alert
+directories:
+  output: release
+  buildResources: resources
+files:
+  - out/**
+  - resources/**
+  - package.json
+asarUnpack:
+  - node_modules/better-sqlite3/**
+npmRebuild: false
+win:
+  icon: resources/icon.ico
+  target:
+    - target: nsis
+      arch: [x64]
+  artifactName: ${productName}-${version}-Windows-${arch}.${ext}
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
