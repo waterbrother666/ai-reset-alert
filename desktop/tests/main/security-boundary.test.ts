@@ -9,7 +9,7 @@ describe('Electron security boundary', () => {
     expect(source).toContain('contextIsolation: true')
     expect(source).toContain('nodeIntegration: false')
     expect(source).toContain('sandbox: true')
-    expect(source).toContain("frame: process.platform !== 'win32'")
+    expect(source).toContain('frame: isMac')
   })
   it('preload exposes a fixed API without generic send access', () => {
     const source = readFileSync(new URL('../../src/preload/index.ts', import.meta.url), 'utf8')
@@ -30,5 +30,13 @@ describe('Electron security boundary', () => {
     expect(tray).toContain("this.tray.on('right-click', () => this.togglePopover())")
     expect(tray).not.toContain('开机启动')
     expect(tray).not.toContain('模拟重置通知')
+  })
+
+  it('uses the native inset title bar and application menu on macOS', () => {
+    const main = readFileSync(new URL('../../src/main/index.ts', import.meta.url), 'utf8')
+    const menu = readFileSync(new URL('../../src/main/macMenu.ts', import.meta.url), 'utf8')
+    expect(main).toContain("titleBarStyle: isMac ? 'hiddenInset' : 'default'")
+    expect(main).toContain('installMacApplicationMenu()')
+    expect(menu).toContain("role: 'quit'")
   })
 })
