@@ -144,7 +144,8 @@ class BrowserApi implements AppApi {
 
   private records(): HistoryRecord[] {
     return this.events.map((event) => ({ id: event.id,
-      observedAt: this.lastCheckAt ?? event.updatedAt, source: API_URL, event }))
+      observedAt: this.lastCheckAt ?? event.updatedAt, source: API_URL,
+      notificationSentAt: null, event }))
   }
 
   private snapshot(): MonitorSnapshot {

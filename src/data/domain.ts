@@ -38,6 +38,7 @@ export interface HistoryRecord {
   id: string
   observedAt: string
   source: string
+  notificationSentAt: string | null
   event: ResetEvent
 }
 
