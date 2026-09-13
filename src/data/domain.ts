@@ -52,7 +52,7 @@ export interface SourceHealth {
 }
 
 export interface MonitorSnapshot {
-  status: 'running' | 'checking' | 'error'
+  status: 'running' | 'paused' | 'checking' | 'error'
   lastCheckAt: string | null
   nextCheckAt: string | null
   upstreamCheckedAt: string | null
@@ -74,6 +74,7 @@ export interface CheckResult {
 export interface HistoryQuery {
   type?: ResetEventType
   status?: ResetEventStatus
+  cursor?: string
   limit?: number
 }
 
