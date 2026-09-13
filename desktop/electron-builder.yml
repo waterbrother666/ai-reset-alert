@@ -16,6 +16,16 @@ win:
     - target: nsis
       arch: [x64]
   artifactName: ${productName}-${version}-Windows-${arch}.${ext}
+mac:
+  icon: resources/icon.icns
+  category: public.app-category.utilities
+  target:
+    - dmg
+    - zip
+  artifactName: ${productName}-${version}-macOS-${arch}.${ext}
+  extendInfo:
+    NSHighResolutionCapable: true
+    NSUserNotificationAlertStyle: alert
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true

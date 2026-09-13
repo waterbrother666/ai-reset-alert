@@ -7,9 +7,10 @@ Native SQLite is rebuilt explicitly for Electron before packaging because a norm
 Node.js test run and Electron use different module ABIs. Run `npm rebuild
 better-sqlite3` if you want to run Node tests again immediately after packaging.
 
-Windows builds produce an x64 NSIS installer. Release signing is intentionally
-environment-driven, so signing credentials belong in CI secrets. Automatic updates
-are deferred until a signed release channel exists.
+Windows builds produce an x64 NSIS installer. macOS builds produce DMG and ZIP
+artifacts for Intel x64 and Apple Silicon arm64. Release signing is intentionally
+environment-driven, so signing and notarization credentials belong in CI secrets.
+Automatic updates are deferred until a signed release channel exists.
 
 The renderer build reuses the web application at the repository root. Electron
 exposes `window.desktopApi`, while browser builds keep using the API fallback.
