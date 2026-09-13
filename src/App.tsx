@@ -15,6 +15,7 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [focusRecordId, setFocusRecordId] = useState<string | null>(null)
   const elasticLayer = useRef<HTMLDivElement | null>(null)
 
   const refresh = useCallback(async () => {
@@ -48,10 +49,21 @@ export default function App() {
     void refresh()
     const offSnapshot = window.appApi.onSnapshotChanged((value) => setSnapshot(value))
     const offSignal = window.appApi.onSignalDetected(() => { void refresh() })
-    return () => { offSnapshot(); offSignal() }
+    const offOpenRecord = window.desktopApi?.onOpenRecord((recordId) => {
+      setFocusRecordId(recordId)
+      setPage('history')
+    }) ?? (() => {})
+    return () => { offSnapshot(); offSignal(); offOpenRecord() }
   }, [refresh])
 
   useEffect(() => {
+    const handleOnline = () => { void window.appApi.checkNow().then(() => refresh()).catch(() => refresh()) }
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [refresh])
+
+  useEffect(() => {
+    if (window.appRuntime !== 'web') return
     const update = () => {
       if (document.visibilityState !== 'visible') return
       void window.appApi.checkNow().then(() => refresh()).catch(() => refresh())
@@ -63,26 +75,33 @@ export default function App() {
 
   useEffect(() => {
     if (page !== 'dashboard') return
-    let offset = 0, velocity = 0
-    let releaseTimer: number | null = null, frame: number | null = null
+    let offset = 0
+    let velocity = 0
+    let releaseTimer: number | null = null
+    let frame: number | null = null
     const render = () => elasticLayer.current?.style.setProperty('--elastic-y', `${offset}px`)
     const springBack = () => {
-      velocity += -offset * 0.095; velocity *= 0.78; offset += velocity; render()
-      if (Math.abs(offset) > 0.08 || Math.abs(velocity) > 0.08) frame = requestAnimationFrame(springBack)
+      velocity += -offset * 0.11
+      velocity *= 0.76
+      offset += velocity
+      render()
+      if (Math.abs(offset) > 0.06 || Math.abs(velocity) > 0.06) frame = requestAnimationFrame(springBack)
       else { offset = 0; velocity = 0; render(); frame = null }
     }
     const handleWheel = (event: WheelEvent) => {
-      if (document.querySelector('[data-day-posts-modal]')) {
-        event.preventDefault()
-        return
-      }
-      event.preventDefault()
+      if (document.querySelector('[data-day-posts-modal]')) return
       if (frame !== null) cancelAnimationFrame(frame)
       if (releaseTimer !== null) window.clearTimeout(releaseTimer)
-      frame = null; offset = Math.max(-48, Math.min(48, offset - event.deltaY * 0.13)); velocity = 0; render()
-      releaseTimer = window.setTimeout(() => { releaseTimer = null; frame = requestAnimationFrame(springBack) }, 90)
+      frame = null
+      offset = Math.max(-18, Math.min(18, offset - event.deltaY * 0.035))
+      velocity = 0
+      render()
+      releaseTimer = window.setTimeout(() => {
+        releaseTimer = null
+        frame = requestAnimationFrame(springBack)
+      }, 70)
     }
-    window.addEventListener('wheel', handleWheel, { passive: false })
+    window.addEventListener('wheel', handleWheel, { passive: true })
     return () => {
       window.removeEventListener('wheel', handleWheel)
       if (releaseTimer !== null) window.clearTimeout(releaseTimer)
@@ -92,12 +111,13 @@ export default function App() {
   }, [page])
 
   return <div className="app-shell flex h-screen flex-col overflow-hidden text-[var(--color-text)]">
-    <TitleBar />
-    <div className="flex min-h-0 flex-1"><div ref={elasticLayer} className="elastic-layer flex min-w-0 flex-1 flex-col">
+    <TitleBar platform={navigator.platform.toLowerCase().includes('mac') ? 'mac' : 'win'} runtime={window.appRuntime ?? 'web'} />
+    <div className="flex min-h-0 flex-1 overflow-hidden"><div ref={elasticLayer} className="elastic-layer flex min-w-0 flex-1 flex-col">
       <main className="min-h-0 flex-1 overflow-y-auto px-6 py-6"><div key={page} className="page-enter">
         {page === 'dashboard' ? <Dashboard snapshot={snapshot} records={records} loading={loading} checking={checking}
           error={error} onCheck={() => { void checkNow() }} onGoHistory={() => setPage('history')} />
-          : <History records={records} loading={loading} error={error} onReload={() => { void refresh() }} onBack={() => setPage('dashboard')} />}
+          : <History records={records} loading={loading} error={error} focusRecordId={focusRecordId}
+              onReload={() => { void refresh() }} onBack={() => { setFocusRecordId(null); setPage('dashboard') }} />}
       </div></main>
     </div></div>
   </div>
