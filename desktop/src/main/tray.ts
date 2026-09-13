@@ -57,14 +57,22 @@ export class AppTray {
 
   private ensurePopover(): BrowserWindow {
     if (this.popover && !this.popover.isDestroyed()) return this.popover
+    const isMac = process.platform === 'darwin'
     const popover = new BrowserWindow({
       width: POPOVER_WIDTH, height: POPOVER_HEIGHT, show: false, frame: false,
       resizable: false, movable: false, minimizable: false, maximizable: false,
       fullscreenable: false, skipTaskbar: true, alwaysOnTop: true, backgroundColor: '#00000000',
       transparent: true,
-      backgroundMaterial: 'none',
+      type: isMac ? 'panel' : undefined,
+      vibrancy: isMac ? 'popover' : undefined,
+      visualEffectState: isMac ? 'active' : undefined,
+      backgroundMaterial: isMac ? undefined : 'none',
       webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true, devTools: false },
     })
+    if (isMac) {
+      popover.setAlwaysOnTop(true, 'pop-up-menu')
+      popover.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+    }
     popover.on('blur', () => popover.hide())
     popover.on('closed', () => { this.popover = null })
     popover.webContents.on('will-navigate', (event, url) => {
@@ -95,7 +103,7 @@ export class AppTray {
     const statusClass = status === 'error' ? 'error' : status === 'paused' ? 'paused' : 'active'
     const toggleLabel = status === 'paused' ? '恢复监控' : '暂停监控'
     const html = `<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'"><style>
-      *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:#eff3f4;font-family:"Microsoft YaHei UI","Segoe UI",sans-serif}
+      *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;color:#eff3f4;font-family:-apple-system,BlinkMacSystemFont,"Microsoft YaHei UI","Segoe UI",sans-serif}
       body{padding:0}.panel{height:100%;overflow:hidden;border:1px solid rgba(47,51,54,.88);border-radius:12px;background:linear-gradient(145deg,rgba(21,23,25,.78),rgba(13,14,15,.72));backdrop-filter:blur(22px) saturate(125%);-webkit-backdrop-filter:blur(22px) saturate(125%);box-shadow:0 14px 36px rgba(0,0,0,.55)}
       .status{display:flex;align-items:center;gap:7px;height:34px;padding:0 11px;border-bottom:1px solid #25282b;color:#aab8c2;font-size:11.5px}.dot{width:6px;height:6px;border-radius:50%;background:#eff3f4;box-shadow:0 0 7px rgba(239,243,244,.45)}.dot.error{background:#e66}.dot.paused{background:#71767b;box-shadow:none}
       .menu{padding:5px}.item{display:flex;align-items:center;height:34px;padding:0 12px;border-radius:8px;color:#eff3f4;text-decoration:none;font-size:12.5px;font-weight:650;transition:background .16s ease,transform .16s ease}.item:hover{background:rgba(36,39,42,.82);transform:translateX(1px)}

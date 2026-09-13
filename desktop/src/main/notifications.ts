@@ -22,6 +22,8 @@ export class NativeNotifications {
           ? `Codex 重置卡${record.event.status === 'confirmed' ? '已确认' : '新预告'}`
           : `Codex 额度重置${record.event.status === 'confirmed' ? '已确认' : '新预告'}`,
         body: (post?.text || post?.originalText || record.event.title).slice(0, 240),
+        subtitle: process.platform === 'darwin' ? '来自 @thsottiaux' : undefined,
+        sound: process.platform === 'darwin' ? 'default' : undefined,
         icon: this.icon,
         silent: false,
         timeoutType: 'never',

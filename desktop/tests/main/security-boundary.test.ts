@@ -39,4 +39,12 @@ describe('Electron security boundary', () => {
     expect(main).toContain('installMacApplicationMenu()')
     expect(menu).toContain("role: 'quit'")
   })
+
+  it('uses a native macOS popover and notification sound', () => {
+    const tray = readFileSync(new URL('../../src/main/tray.ts', import.meta.url), 'utf8')
+    const notifications = readFileSync(new URL('../../src/main/notifications.ts', import.meta.url), 'utf8')
+    expect(tray).toContain("vibrancy: isMac ? 'popover' : undefined")
+    expect(tray).toContain('visibleOnFullScreen: true')
+    expect(notifications).toContain("sound: process.platform === 'darwin' ? 'default' : undefined")
+  })
 })
