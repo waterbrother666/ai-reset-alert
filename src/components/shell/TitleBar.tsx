@@ -3,7 +3,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 const DRAG = { WebkitAppRegion: "drag" } as CSSProperties;
 const NO_DRAG = { WebkitAppRegion: "no-drag" } as CSSProperties;
 
-// 无边框自定义标题栏：左侧 macOS 交通灯占位 / 右侧 Windows 按钮位，中间显示仓库名
+// macOS keeps its native traffic lights; Windows uses the controls rendered here.
 export function TitleBar({
   platform,
   runtime,
@@ -21,17 +21,10 @@ export function TitleBar({
 
   return (
     <header
-      className="relative z-50 flex h-12 shrink-0 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-glass-strong)] pl-3 backdrop-blur-2xl select-none"
+      className={`relative z-50 flex h-12 shrink-0 items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-glass-strong)] backdrop-blur-2xl select-none ${runtime === "desktop" && platform === "mac" ? "pl-[78px] pr-3" : "pl-3"}`}
       style={runtime === "desktop" ? DRAG : undefined}
     >
       <div className="flex items-center gap-3">
-        {platform === "mac" && (
-          <div className="flex items-center gap-2" style={NO_DRAG}>
-            <span className="h-3 w-3 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-surface-2)]" />
-            <span className="h-3 w-3 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-surface-2)]" />
-            <span className="h-3 w-3 rounded-full bg-[var(--color-brand)]" />
-          </div>
-        )}
         <div className="flex items-center gap-2.5">
           <img src="./app-icon.png" alt="" draggable={false}
             className="h-6 w-6 rounded-[7px] object-cover ring-1 ring-white/15" />
