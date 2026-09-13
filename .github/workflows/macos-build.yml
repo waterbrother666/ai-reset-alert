@@ -1,0 +1,36 @@
+name: macOS build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-14
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+        working-directory: .
+      - run: npm install
+      - run: npm test
+      - run: npm run build
+      - run: npx electron-rebuild -f -w better-sqlite3 -a ${{ matrix.arch }}
+      - run: npx electron-builder --mac dmg zip --${{ matrix.arch }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ai-reset-alert-macOS-${{ matrix.arch }}
+          path: desktop/release/*
