@@ -6,6 +6,7 @@ import { IPC_CHANNELS } from '../shared/desktop-api'
 import { registerIpc } from './ipc'
 import { APP_NAME, WINDOWS_APP_ID } from './appIdentity'
 import { AppLogger } from './logger'
+import { installMacApplicationMenu } from './macMenu'
 import { NativeNotifications } from './notifications'
 import { MonitorScheduler } from './scheduler'
 import { AppTray } from './tray'
@@ -42,10 +43,13 @@ function openRecord(recordId?: string): void {
 }
 
 function createWindow(): void {
+  const isMac = process.platform === 'darwin'
   mainWindow = new BrowserWindow({
     width: 1060, height: 720, minWidth: 900, minHeight: 620, show: false,
     backgroundColor: '#000000', title: APP_NAME, icon: join(resourcesPath, 'icon.png'),
-    frame: process.platform !== 'win32',
+    frame: isMac,
+    titleBarStyle: isMac ? 'hiddenInset' : 'default',
+    trafficLightPosition: isMac ? { x: 16, y: 16 } : undefined,
     webPreferences: {
       preload: join(__dirname, '../preload/index.cjs'), contextIsolation: true,
       nodeIntegration: false, sandbox: true, webSecurity: true, devTools: !app.isPackaged,
@@ -103,7 +107,10 @@ app.on('will-quit', (event) => {
 })
 
 if (hasSingleInstanceLock) void app.whenReady().then(async () => {
-  if (process.platform !== 'darwin') Menu.setApplicationMenu(null)
+  if (process.platform === 'darwin') {
+    installMacApplicationMenu()
+    app.dock?.setIcon(join(resourcesPath, 'icon.png'))
+  } else Menu.setApplicationMenu(null)
   const activeLogger = new AppLogger(app.getPath('logs'))
   logger = activeLogger
   process.on('uncaughtException', (error) => activeLogger.error('Uncaught exception', error))
