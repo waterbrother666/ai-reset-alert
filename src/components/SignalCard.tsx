@@ -5,7 +5,6 @@ import { CATEGORY_TONE, absoluteTime } from "../lib/format";
 import { ExternalIcon, BellIcon, ChevronDownIcon } from "./ui/Icon";
 
 function NotifyTag({ state }: { state: SignalRecord["notify"] }) {
-  if (state === "not_applicable") return null;
   const notified = state === "notified";
   return (
     <span className={`inline-flex items-center gap-1 text-[12.5px] ${notified ? "text-[var(--color-ok)]" : "text-[var(--color-text-faint)]"}`}>
@@ -30,10 +29,9 @@ interface TiboPostProps {
   compact?: boolean;
   expanded?: boolean;
   onToggle?: () => void;
-  showNotification?: boolean;
 }
 
-export function TiboPost({ record, compact = false, expanded, onToggle, showNotification = false }: TiboPostProps) {
+export function TiboPost({ record, compact = false, expanded, onToggle }: TiboPostProps) {
   const [localExpanded, setLocalExpanded] = useState(false);
   const isExpanded = expanded ?? localExpanded;
   const toggle = onToggle ?? (() => setLocalExpanded((value) => !value));
@@ -65,7 +63,7 @@ export function TiboPost({ record, compact = false, expanded, onToggle, showNoti
 
         <div className={`${compact ? "mt-2.5" : "mt-4"} flex flex-wrap items-center gap-2`}>
           <CategoryChip record={record} />
-          {showNotification && <NotifyTag state={record.notify} />}
+          <NotifyTag state={record.notify} />
           {long && (
             <button onClick={toggle} aria-expanded={isExpanded} className="inline-flex items-center gap-1 rounded px-1.5 py-1 text-[13px] font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
               {isExpanded ? "收起" : "展开"}

@@ -5,7 +5,7 @@ export type Category =
   | 'reset_credit_announced'
   | 'reset_credit_released'
 
-export type NotifyState = 'notified' | 'not_notified' | 'not_applicable'
+export type NotifyState = 'notified' | 'not_notified'
 
 export interface SignalRecord {
   id: string

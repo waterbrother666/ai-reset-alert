@@ -6,7 +6,7 @@ import { SearchIcon, InboxIcon, AlertIcon, RefreshIcon, ChevronLeftIcon } from '
 
 function HistoryRow({ record, expanded, onToggle }: { record: SignalRecord; expanded: boolean; onToggle: () => void }) {
   return <div className="border-b border-[var(--color-border)] px-4 py-4 last:border-0 hover:bg-[var(--color-surface-2)]/50 sm:px-5">
-    <TiboPost record={record} compact expanded={expanded} onToggle={onToggle} showNotification />
+    <TiboPost record={record} compact expanded={expanded} onToggle={onToggle} />
   </div>
 }
 

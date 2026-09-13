@@ -17,7 +17,7 @@ export function toSignal(record: HistoryRecord): SignalRecord {
     body: post?.text ?? event.title,
     originalText: post?.originalText ?? '',
     publishedAt: Date.parse(post?.publishedAt ?? event.createdAt),
-    notify: 'not_applicable',
+    notify: record.notificationSentAt ? 'notified' : 'not_notified',
     url: post?.url ?? event.url,
     related: true,
     status: event.status,
