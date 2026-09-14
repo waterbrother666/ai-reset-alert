@@ -47,4 +47,10 @@ describe('Electron security boundary', () => {
     expect(tray).toContain('visibleOnFullScreen: true')
     expect(notifications).toContain("sound: process.platform === 'darwin' ? 'default' : undefined")
   })
+
+  it('loads the Tibo avatar from the packaged renderer directory', () => {
+    const signalCard = readFileSync(new URL('../../../src/components/SignalCard.tsx', import.meta.url), 'utf8')
+    expect(signalCard).toContain('src="./tibo-avatar.jpg"')
+    expect(signalCard).not.toContain('src="/tibo-avatar.jpg"')
+  })
 })
