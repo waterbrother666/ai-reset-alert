@@ -39,7 +39,7 @@ export function TiboPost({ record, compact = false, expanded, onToggle }: TiboPo
 
   return (
     <article className={`flex items-start ${compact ? "gap-3" : "gap-3.5"}`}>
-      <img src="/tibo-avatar.jpg" alt="Tibo" className={`${compact ? "h-10 w-10" : "h-12 w-12"} shrink-0 rounded-full object-cover ring-1 ring-[var(--color-border)]`} />
+      <img src="./tibo-avatar.jpg" alt="Tibo" className={`${compact ? "h-10 w-10" : "h-12 w-12"} shrink-0 rounded-full object-cover ring-1 ring-[var(--color-border)]`} />
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 leading-tight">
           <span className="font-bold text-[var(--color-text)]">Tibo</span>
